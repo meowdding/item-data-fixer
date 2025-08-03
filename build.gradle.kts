@@ -25,6 +25,7 @@ cloche {
         withPublication()
     }
     val v4325 = common("4325") {
+        withPublication()
         dependsOn(root)
     }
 
@@ -96,4 +97,9 @@ publishing {
             }
         }
     }
+}
+
+artifacts {
+    add("fabric1215RuntimeElements", tasks["fabric1215JarInJar"])
+    add("fabric1218RuntimeElements", tasks["fabric1218JarInJar"])
 }
