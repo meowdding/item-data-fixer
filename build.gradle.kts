@@ -11,6 +11,9 @@ repositories {
     maven(url = "https://maven.teamresourceful.com/repository/maven-public/")
     maven(url = "https://maven.teamresourceful.com/repository/msrandom/")
     mavenCentral()
+    cloche {
+        mavenParchment()
+    }
 }
 
 cloche {
@@ -28,6 +31,10 @@ cloche {
         withPublication()
         dependsOn(root)
     }
+    val v4548 = common("4548") {
+        withPublication()
+        dependsOn(root)
+    }
 
     fun fabric(
         name: String,
@@ -36,6 +43,7 @@ cloche {
         loaderVersion: Provider<String> = libs.versions.fabric.loader,
     ) {
         fabric("fabric:$name") {
+            includedClient()
             dependsOn(parent)
             this.minecraftVersion = minecraftVersion
             this.loaderVersion = loaderVersion
@@ -51,6 +59,11 @@ cloche {
 
     fabric("1.21.5", v4325)
     fabric("1.21.8", v4325)
+    fabric("1.21.9", v4548, "1.21.9-pre1")
+}
+
+ksp {
+    arg("actualStubDir", project.layout.buildDirectory.dir("generated/ksp/main/stubs").get().asFile.absolutePath)
 }
 
 dependencies {
@@ -97,9 +110,4 @@ publishing {
             }
         }
     }
-}
-
-artifacts {
-    add("fabric1215RuntimeElements", tasks["fabric1215JarInJar"])
-    add("fabric1218RuntimeElements", tasks["fabric1218JarInJar"])
 }

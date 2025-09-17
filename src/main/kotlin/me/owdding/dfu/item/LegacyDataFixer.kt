@@ -67,7 +67,7 @@ object LegacyDataFixer {
         if (MeowddingItemDfu.logErrors && !tag.isEmpty && !tag.getCompoundOrEmpty("tag").isEmpty) {
             MeowddingItemDfu.warn(
                 """
-            Item tag is not empty after applying fixers for ${stack.get(DataComponents.CUSTOM_DATA)?.unsafe?.getString("id")}:
+            Item tag is not empty after applying fixers for ${stack.get(DataComponents.CUSTOM_DATA)?.copyTag()?.getString("id")}:
             ${NbtUtils.prettyPrint(tag)}
             ${stack.toJson(ItemStack.CODEC)}
             """.trimIndent(),
