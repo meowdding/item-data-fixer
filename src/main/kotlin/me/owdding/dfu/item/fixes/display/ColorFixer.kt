@@ -6,11 +6,12 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.DyedItemColor
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
 object ColorFixer : DataComponentFixer<DyedItemColor> {
 
-    private val cache = Int2ObjectOpenHashMap<DyedItemColor>()
+    private val cache = ConcurrentHashMap<Int, DyedItemColor>()
 
     private const val DISPLAY_TAG = "display"
     private const val TAG = "color"

@@ -13,6 +13,7 @@ repositories {
     mavenCentral()
     cloche {
         mavenParchment()
+        mavenFabric()
     }
 }
 
@@ -53,6 +54,7 @@ cloche {
                     modId = "fabricloader"
                     required = true
                 }
+                custom("modmenu" to mapOf("badges" to listOf("library")))
             }
         }
     }

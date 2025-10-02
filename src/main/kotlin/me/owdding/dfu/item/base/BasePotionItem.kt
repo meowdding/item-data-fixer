@@ -8,6 +8,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.alchemy.Potions
+import java.util.concurrent.ConcurrentHashMap
 
 object BasePotionItem {
 
@@ -146,7 +147,7 @@ object BasePotionItem {
         potions.defaultReturnValue(Potions.WATER)
     }
 
-    private val cache = Int2ObjectOpenHashMap<PotionContents>()
+    private val cache = ConcurrentHashMap<Int, PotionContents>()
 
     fun getBase(meta: Int, tag: CompoundTag?): Pair<Item, PotionContents> {
         tag?.remove("CustomPotionEffects")

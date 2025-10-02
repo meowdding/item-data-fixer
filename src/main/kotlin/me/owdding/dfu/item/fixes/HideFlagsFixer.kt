@@ -5,10 +5,12 @@ import me.owdding.dfu.item.DataComponentFixer
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.component.TooltipDisplay
+import java.util.concurrent.ConcurrentHashMap
 
 object HideFlagsFixer : DataComponentFixer<TooltipDisplay> {
-    private val cache: Byte2ObjectOpenHashMap<TooltipDisplay> = Byte2ObjectOpenHashMap()
+    private val cache = ConcurrentHashMap<Byte, TooltipDisplay>()
 
     private const val TAG = "HideFlags"
 

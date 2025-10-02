@@ -9,11 +9,12 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.ResolvableProfile
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
 object SkullTextureFixer : DataComponentFixer<ResolvableProfile> {
 
-    private val cache = mutableMapOf<String, ResolvableProfile>()
+    private val cache = ConcurrentHashMap<String, ResolvableProfile>()
     private const val TAG = "SkullOwner"
 
     override val type: DataComponentType<ResolvableProfile> = DataComponents.PROFILE
