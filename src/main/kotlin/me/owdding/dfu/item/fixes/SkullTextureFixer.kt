@@ -29,7 +29,7 @@ object SkullTextureFixer : DataComponentFixer<ResolvableProfile> {
         return cache.getOrPut(texture) {
             createResolvableProfile(
                 null, null,
-                createPropertyMap().apply {
+                createPropertyMap {
                     put("textures", Property("textures", texture))
                 },
             )
