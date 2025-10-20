@@ -9,6 +9,7 @@ import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.component.ResolvableProfile
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.jvm.optionals.getOrNull
 
@@ -28,7 +29,7 @@ object SkullTextureFixer : DataComponentFixer<ResolvableProfile> {
 
         return cache.getOrPut(texture) {
             createResolvableProfile(
-                null, null,
+                "meow", UUID.randomUUID(),
                 createPropertyMap {
                     put("textures", Property("textures", texture))
                 },

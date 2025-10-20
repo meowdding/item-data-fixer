@@ -7,4 +7,4 @@ import net.minecraft.world.item.component.ResolvableProfile
 import java.util.*
 
 internal actual fun createPropertyMap(init: Multimap<String, Property>.() -> Unit): PropertyMap = PropertyMap().apply(init)
-internal actual fun createResolvableProfile(name: String?, uuid: UUID?, properties: PropertyMap): ResolvableProfile = ResolvableProfile(Optional.ofNullable(name), Optional.ofNullable(uuid), properties)
+internal actual fun createResolvableProfile(name: String, uuid: UUID, properties: PropertyMap): ResolvableProfile = ResolvableProfile(Optional.ofNullable(name), Optional.ofNullable(uuid), properties)

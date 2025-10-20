@@ -13,7 +13,7 @@ import java.util.UUID
 @Stub
 internal expect fun createPropertyMap(init: Multimap<String, Property>.() -> Unit): PropertyMap
 @Stub
-internal expect fun createResolvableProfile(name: String?, uuid: UUID?, properties: PropertyMap): ResolvableProfile
+internal expect fun createResolvableProfile(name: String, uuid: UUID, properties: PropertyMap): ResolvableProfile
 
 object MeowddingItemDfu : Logger by LoggerFactory.getLogger("MeowddingItemDfu") {
 
