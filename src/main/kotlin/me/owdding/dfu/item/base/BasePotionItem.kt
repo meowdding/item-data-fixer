@@ -9,6 +9,7 @@ import net.minecraft.world.item.alchemy.Potion
 import net.minecraft.world.item.alchemy.PotionContents
 import net.minecraft.world.item.alchemy.Potions
 import java.util.concurrent.ConcurrentHashMap
+import me.owdding.dfu.item.remove
 
 object BasePotionItem {
 

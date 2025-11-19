@@ -1,4 +1,3 @@
-import com.google.devtools.ksp.gradle.KspTask
 import earth.terrarium.cloche.api.target.CommonTarget
 
 plugins {
@@ -36,6 +35,10 @@ cloche {
         withPublication()
         dependsOn(root)
     }
+    val v4663 = common("4663") {
+        withPublication()
+        dependsOn(root)
+    }
 
     fun fabric(
         name: String,
@@ -52,7 +55,7 @@ cloche {
             metadata {
                 dependency {
                     modId = "fabricloader"
-                    required = true
+                    //required = true
                 }
                 custom("modmenu" to mapOf("badges" to listOf("library")))
             }
@@ -62,10 +65,7 @@ cloche {
     fabric("1.21.5", v4325)
     fabric("1.21.8", v4325)
     fabric("1.21.9", v4548)
-}
-
-ksp {
-    arg("actualStubDir", project.layout.buildDirectory.dir("generated/ksp/main/stubs").get().asFile.absolutePath)
+    fabric("1.21.11", v4663, "1.21.11-pre1")
 }
 
 dependencies {
@@ -83,8 +83,6 @@ kotlin {
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
 }
-
-tasks.withType(KspTask::class).configureEach { enabled = false }
 
 publishing {
     publications {

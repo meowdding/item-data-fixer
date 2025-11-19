@@ -7,7 +7,11 @@ import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.resources.ResourceLocation
+import me.owdding.dfu.item.ResourceLocation
+import me.owdding.dfu.item.withDefaultNamespace
+import me.owdding.dfu.item.parse
+import me.owdding.dfu.item.toShortLanguageKey
+import me.owdding.dfu.item.createBannerPattern
 import net.minecraft.tags.ItemTags
 import net.minecraft.world.item.DyeColor
 import net.minecraft.world.item.Item
@@ -17,10 +21,10 @@ import net.minecraft.world.level.block.entity.BannerPatternLayers.Layer
 import kotlin.jvm.optionals.getOrNull
 
 private val PATTERN_MAP = Object2ObjectOpenHashMap<String, Holder<BannerPattern>>().apply {
-    fun createPattern(parse: ResourceLocation) = Holder.direct(BannerPattern(parse, "block.minecraft.banner.${parse.toShortLanguageKey()}"))
+    fun createPattern(parse: ResourceLocation) = Holder.direct(createBannerPattern(parse, "block.minecraft.banner.${parse.toShortLanguageKey()}"))
 
     fun putPattern(old: String, location: String) {
-        val parse = ResourceLocation.parse(location)
+        val parse = parse(location)
         put(old, createPattern(parse))
     }
 
@@ -65,7 +69,7 @@ private val PATTERN_MAP = Object2ObjectOpenHashMap<String, Holder<BannerPattern>
     putPattern("flo", "minecraft:flower")
     putPattern("moj", "minecraft:mojang")
     putPattern("pig", "minecraft:piglin")
-    defaultReturnValue(createPattern(ResourceLocation.withDefaultNamespace("base")))
+    defaultReturnValue(createPattern(withDefaultNamespace("base")))
 }
 
 const val TAG = "BlockEntityTag"
