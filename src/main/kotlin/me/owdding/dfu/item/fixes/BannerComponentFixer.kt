@@ -1,3 +1,4 @@
+//~identifier
 package me.owdding.dfu.item.fixes
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
