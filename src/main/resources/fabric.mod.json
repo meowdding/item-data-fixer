@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "meowdding-item-dfu",
+  "version": "${version}",
+  "name": "Meowdding Item Dfu",
+  "description": "A library to convert items from legacy (1.8.9) format to modern.",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "environment": "*",
+  "custom(\"modmenu\" to mapOf(\"badges\" to listOf(\"library\")))": ""
+}

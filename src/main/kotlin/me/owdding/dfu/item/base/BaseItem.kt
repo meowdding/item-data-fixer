@@ -4,8 +4,6 @@ package me.owdding.dfu.item.base
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import me.owdding.dfu.item.MeowddingItemDfu
-import me.owdding.dfu.item.remove
-import me.owdding.dfu.item.ResourceLocation
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
@@ -776,7 +774,7 @@ object BaseItem {
             item === Items.POLAR_BEAR_SPAWN_EGG && meta == 0 -> Triple(
                 Items.POLAR_BEAR_SPAWN_EGG,
                 count,
-                DataComponentPatch.builder().set(DataComponents.ITEM_MODEL as DataComponentType<ResourceLocation>, blankEggModel),
+                DataComponentPatch.builder().set(DataComponents.ITEM_MODEL, blankEggModel),
             )
 
             else -> Triple(
