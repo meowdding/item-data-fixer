@@ -2,8 +2,8 @@ package me.owdding.dfu.item.fixes
 
 import com.mojang.authlib.properties.Property
 import me.owdding.dfu.item.DataComponentFixer
-import me.owdding.dfu.item.createResolvableProfile
-import me.owdding.dfu.item.createPropertyMap
+import me.owdding.dfu.item.utils.createResolvableProfile
+import me.owdding.dfu.item.utils.createPropertyMap
 import me.owdding.dfu.item.utils.getStringOrNull
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents

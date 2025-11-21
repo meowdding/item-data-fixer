@@ -8,7 +8,7 @@ import net.minecraft.nbt.Tag
 import net.minecraft.world.item.Item
 import kotlin.jvm.optionals.getOrNull
 
-interface DataComponentFixer<T> {
+interface DataComponentFixer<T : Any> {
 
     val type: DataComponentType<T>
     fun getData(tag: CompoundTag): T?

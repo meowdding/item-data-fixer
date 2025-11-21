@@ -5,6 +5,7 @@ package me.owdding.dfu.item.base
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import me.owdding.dfu.item.MeowddingItemDfu
 import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.item.Item
