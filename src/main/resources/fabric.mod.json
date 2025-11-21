@@ -8,5 +8,9 @@
   "contact": {},
   "license": "MIT",
   "environment": "*",
-  "custom(\"modmenu\" to mapOf(\"badges\" to listOf(\"library\")))": ""
+  "custom": {
+    "modmenu": {
+      "badges": ["library"]
+    }
+  }
 }

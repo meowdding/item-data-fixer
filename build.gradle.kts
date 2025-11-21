@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
 import org.gradle.kotlin.dsl.modImplementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -11,7 +13,6 @@ plugins {
     kotlin("jvm") version "2.2.20"
     alias(libs.plugins.ksp)
     `versioned-catalogues`
-    `maven-publish`
 }
 
 repositories {
@@ -61,6 +62,15 @@ java {
     withSourcesJar()
 }
 
+tasks.named("remapJar", RemapJarTask::class) {
+    archiveBaseName = "item-data-fixer"
+    archiveClassifier = stonecutter.current.version
+}
+tasks.named("remapSourcesJar", RemapSourcesJarTask::class) {
+    archiveBaseName = "item-data-fixer"
+    archiveClassifier = stonecutter.current.version + "-sources"
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
     options.release.set(21)
@@ -88,36 +98,5 @@ idea {
         isDownloadSources = true
 
         excludeDirs.add(file("run"))
-    }
-}
-
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-
-            version = project.version.toString() + "-" + stonecutter.current.version
-
-            pom {
-                name.set("item-data-fixer")
-                url.set("https://github.com/meowdding/item-data-fixer")
-
-                scm {
-                    connection.set("https://github.com/meowdding/item-data-fixer.git")
-                    developerConnection.set("git:https://github.com/meowdding/item-data-fixer.git")
-                    url.set("https://github.com/meowdding/item-data-fixer")
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            setUrl("https://maven.teamresourceful.com/repository/thatgravyboat/")
-            credentials {
-                username = System.getenv("MAVEN_USER") ?: providers.gradleProperty("maven_username").orNull
-                password = System.getenv("MAVEN_PASS") ?: providers.gradleProperty("maven_password").orNull
-            }
-        }
     }
 }
