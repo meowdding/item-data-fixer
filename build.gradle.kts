@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     idea
     id("fabric-loom")
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm")
     alias(libs.plugins.ksp)
     `versioned-catalogues`
 }
