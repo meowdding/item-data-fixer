@@ -100,3 +100,19 @@ idea {
         excludeDirs.add(file("run"))
     }
 }
+
+base {
+    archivesName = "meowdding-data-fixer"
+}
+
+tasks.named<Jar>("jar") {
+    archiveClassifier = "${stonecutter.current.version}-dev"
+}
+
+tasks.named<Jar>("sourcesJar") {
+    archiveClassifier = "${stonecutter.current.version}-sources"
+}
+
+tasks.named<RemapJarTask>("remapJar") {
+    archiveClassifier = stonecutter.current.version
+}
