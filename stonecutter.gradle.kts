@@ -4,17 +4,20 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 plugins {
     id("dev.kikugie.stonecutter")
     id("fabric-loom") version "1.14-SNAPSHOT" apply false
-    id("org.jetbrains.kotlin.jvm") version "2.2.0" apply false
+    id("net.fabricmc.fabric-loom") version "1.14-SNAPSHOT" apply false
     `maven-publish`
 }
-stonecutter active "1.21.11"
+stonecutter active "26.1"
 
 stonecutter parameters {
     swaps["mod_version"] = "\"" + property("version") + "\";"
     swaps["minecraft"] = "\"" + node.metadata.version + "\";"
     replacements.string("identifier") {
         direction = eval(current.version, "<1.21.11")
-        replace("import net.minecraft.resources.Identifier", "import net.minecraft.resources.ResourceLocation as Identifier")
+        replace(
+            "import net.minecraft.resources.Identifier",
+            "import net.minecraft.resources.ResourceLocation as Identifier"
+        )
     }
 }
 
@@ -25,33 +28,88 @@ val minecraftVersionAttribute = Attribute.of("net.minecraft.version", String::cl
 val remappedAttribute = Attribute.of("net.fabricmc.remapped", String::class.java)
 
 stonecutter.versions.forEach { (project, version) ->
+    fun isObfuscated() = stonecutter.eval(version, "<=1.21.11")
+
+    fun runIfObfuscated(action: () -> Unit) {
+        if (isObfuscated()) action()
+    }
+
+
+    fun <T> selectIfObfuscated(obfuscated: T, unobfuscated: T) = if (isObfuscated()) obfuscated else unobfuscated
+
+
     val gradleFriendlyVersion = version.replace(".", "")
     val project = project(project)
-    val remappedApiElements = configurations.create(gradleFriendlyVersion + "remappedApiElements") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
 
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-            attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.STANDARD_JVM))
-            attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-            attribute(minecraftVersionAttribute, version)
-            attribute(remappedAttribute, "true")
+    runIfObfuscated {
+        val remappedApiElements = configurations.create(gradleFriendlyVersion + "remappedApiElements") {
+            isCanBeResolved = false
+            isCanBeConsumed = true
+
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
+                attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
+                attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+                attribute(
+                    TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                    objects.named(TargetJvmEnvironment.STANDARD_JVM)
+                )
+                attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
+                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+                attribute(minecraftVersionAttribute, version)
+                attribute(remappedAttribute, "true")
+            }
+
+            project.afterEvaluate {
+                this@create.dependencies.addAll(configurations.named("api").get().dependencies)
+                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
+                outgoing.artifact(tasks.named("remapJar"))
+            }
+
+            outgoing.capability("me.owdding:item-data-fixer-$version-remapped:${rootProject.version}")
+            outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
         }
 
-        project.afterEvaluate {
-            this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
-            outgoing.artifact(tasks.named("remapJar"))
+        val remappedRuntimeElements = configurations.create(gradleFriendlyVersion + "remappedRuntimeElements") {
+            isCanBeResolved = false
+            isCanBeConsumed = true
+
+            attributes {
+                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
+                attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
+                attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
+                attribute(
+                    TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                    objects.named(TargetJvmEnvironment.STANDARD_JVM)
+                )
+                attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
+                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
+                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
+                attribute(minecraftVersionAttribute, version)
+                attribute(remappedAttribute, "true")
+            }
+
+            project.afterEvaluate {
+                this@create.dependencies.addAll(configurations.named("runtimeOnly").get().dependencies)
+                this@create.dependencies.addAll(configurations.named("modRuntimeOnly").get().dependencies)
+                this@create.dependencies.addAll(configurations.named("api").get().dependencies)
+                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
+                outgoing.artifact(tasks.named("remapJar"))
+            }
+
+            outgoing.capability("me.owdding:item-data-fixer-$version-remapped:${rootProject.version}")
+            outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
         }
 
-        outgoing.capability("me.owdding:item-data-fixer-$version-remapped:${rootProject.version}")
-        outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
+        dataFixerComponent.addVariantsFromConfiguration(remappedApiElements) {
+            mapToOptional()
+        }
+        dataFixerComponent.addVariantsFromConfiguration(remappedRuntimeElements) {
+            mapToOptional()
+        }
     }
+
     val apiElements = configurations.create(gradleFriendlyVersion + "apiElements") {
         isCanBeResolved = false
         isCanBeConsumed = true
@@ -59,8 +117,11 @@ stonecutter.versions.forEach { (project, version) ->
         attributes {
             attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
             attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-            attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.STANDARD_JVM))
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, selectIfObfuscated(21, 25))
+            attribute(
+                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                objects.named(TargetJvmEnvironment.STANDARD_JVM)
+            )
             attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
             attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
@@ -70,7 +131,9 @@ stonecutter.versions.forEach { (project, version) ->
 
         project.afterEvaluate {
             this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
+            runIfObfuscated {
+                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
+            }
             outgoing.artifact(tasks.named("jar"))
         }
 
@@ -78,33 +141,6 @@ stonecutter.versions.forEach { (project, version) ->
         outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
     }
 
-    val remappedRuntimeElements = configurations.create(gradleFriendlyVersion + "remappedRuntimeElements") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-            attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.STANDARD_JVM))
-            attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-            attribute(minecraftVersionAttribute, version)
-            attribute(remappedAttribute, "true")
-        }
-
-        project.afterEvaluate {
-            this@create.dependencies.addAll(configurations.named("runtimeOnly").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("modRuntimeOnly").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
-            outgoing.artifact(tasks.named("remapJar"))
-        }
-
-        outgoing.capability("me.owdding:item-data-fixer-$version-remapped:${rootProject.version}")
-        outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
-    }
     val runtimeElements = configurations.create(gradleFriendlyVersion + "runtimeElements") {
         isCanBeResolved = false
         isCanBeConsumed = true
@@ -112,8 +148,11 @@ stonecutter.versions.forEach { (project, version) ->
         attributes {
             attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
             attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-            attribute(TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE, objects.named(TargetJvmEnvironment.STANDARD_JVM))
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, selectIfObfuscated(21, 25))
+            attribute(
+                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
+                objects.named(TargetJvmEnvironment.STANDARD_JVM)
+            )
             attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
             attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
@@ -123,9 +162,11 @@ stonecutter.versions.forEach { (project, version) ->
 
         project.afterEvaluate {
             this@create.dependencies.addAll(configurations.named("runtimeOnly").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("modRuntimeOnly").get().dependencies)
             this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
+            runIfObfuscated {
+                this@create.dependencies.addAll(configurations.named("modRuntimeOnly").get().dependencies)
+                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
+            }
             outgoing.artifact(tasks.named("jar"))
         }
 
@@ -154,12 +195,6 @@ stonecutter.versions.forEach { (project, version) ->
         outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
     }
 
-    dataFixerComponent.addVariantsFromConfiguration(remappedApiElements) {
-        mapToOptional()
-    }
-    dataFixerComponent.addVariantsFromConfiguration(remappedRuntimeElements) {
-        mapToOptional()
-    }
     dataFixerComponent.addVariantsFromConfiguration(apiElements) {
         mapToOptional()
     }

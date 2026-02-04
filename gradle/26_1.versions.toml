@@ -1,0 +1,7 @@
+[versions]
+
+minecraft = "26.1-snapshot-6"
+
+[libraries]
+
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }

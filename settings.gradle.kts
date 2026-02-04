@@ -5,7 +5,6 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
     id("dev.kikugie.stonecutter") version "0.7.10"
@@ -13,12 +12,14 @@ plugins {
 
 rootProject.name = "item-data-fixer"
 
-val versions = listOf("1.21.5", "1.21.8", "1.21.9", "1.21.10", "1.21.11")
+val versions = listOf("1.21.5", "1.21.8", "1.21.9", "1.21.10", "1.21.11", "26.1")
 
 stonecutter {
     create(rootProject) {
-        versions(versions)
-        vcsVersion = versions.first()
+        versions.forEach {
+            version(it).buildscript = if (stonecutter.eval(it, "<=1.21.11")) "build.obf.gradle.kts" else "build.gradle.kts"
+        }
+        vcsVersion = versions.last()
     }
 }
 
