@@ -10,20 +10,36 @@ object LegacyTextFixer {
     val EMPTY: Style = Style.EMPTY.withItalic(false)
 
     private const val CONTROL_CHAR = '§'
-    val codeMap = buildMap {
-        fun put(formatting: ChatFormatting, init: Style.() -> Style) {
-            put(formatting.char.lowercaseChar(), init)
+    val codeMap = buildMap<Char, Style.() -> Style> {
+        fun put(char: Char, init: Style.() -> Style) {
+            put(char.lowercaseChar(), init)
         }
 
-        ChatFormatting.entries.filter { it.isColor }.forEach { formatting -> put(formatting) { EMPTY.withColor(formatting) } }
+        // Color Codes
+        put('0') { EMPTY.withColor(ChatFormatting.BLACK) }
+        put('1') { EMPTY.withColor(ChatFormatting.DARK_BLUE) }
+        put('2') { EMPTY.withColor(ChatFormatting.DARK_GREEN) }
+        put('3') { EMPTY.withColor(ChatFormatting.DARK_AQUA) }
+        put('4') { EMPTY.withColor(ChatFormatting.DARK_RED) }
+        put('5') { EMPTY.withColor(ChatFormatting.DARK_PURPLE) }
+        put('6') { EMPTY.withColor(ChatFormatting.GOLD) }
+        put('7') { EMPTY.withColor(ChatFormatting.GRAY) }
+        put('8') { EMPTY.withColor(ChatFormatting.DARK_GRAY) }
+        put('9') { EMPTY.withColor(ChatFormatting.BLUE) }
+        put('a') { EMPTY.withColor(ChatFormatting.GREEN) }
+        put('b') { EMPTY.withColor(ChatFormatting.AQUA) }
+        put('c') { EMPTY.withColor(ChatFormatting.RED) }
+        put('d') { EMPTY.withColor(ChatFormatting.LIGHT_PURPLE) }
+        put('e') { EMPTY.withColor(ChatFormatting.YELLOW) }
+        put('f') { EMPTY.withColor(ChatFormatting.WHITE) }
 
-        put(ChatFormatting.BOLD) { this.withBold(true) }
-        put(ChatFormatting.ITALIC) { this.withItalic(true) }
-        put(ChatFormatting.STRIKETHROUGH) { this.withStrikethrough(true) }
-        put(ChatFormatting.UNDERLINE) { this.withUnderlined(true) }
-        put(ChatFormatting.OBFUSCATED) { this.withObfuscated(true) }
-
-        put(ChatFormatting.RESET) { EMPTY }
+        // Format Modifiers
+        put('k') { this.withObfuscated(true) }
+        put('l') { this.withBold(true) }
+        put('m') { this.withStrikethrough(true) }
+        put('n') { this.withUnderlined(true) }
+        put('o') { this.withItalic(true) }
+        put('r') { EMPTY }
     }
 
     fun parse(text: String): Component = Component.empty().apply {

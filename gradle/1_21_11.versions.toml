@@ -1,6 +1,6 @@
 [versions]
 
-minecraft = "1.21.11-pre1"
+minecraft = "1.21.11"
 parchment = "2025.10.12"
 
 [libraries]

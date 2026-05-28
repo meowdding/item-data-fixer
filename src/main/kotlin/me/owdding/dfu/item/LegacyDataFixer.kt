@@ -45,9 +45,7 @@ object LegacyDataFixer {
         if (base == null) {
             MeowddingItemDfu.error(
                 "Base item not found for ${tag.getStringOrNull("id")} (${tag.getStringOrNull("Damage")})\n${
-                    NbtUtils.prettyPrint(
-                        tag
-                    )
+                    prettyPrint(tag)
                 }"
             )
             return null
@@ -68,12 +66,19 @@ object LegacyDataFixer {
             MeowddingItemDfu.warn(
                 """
             Item tag is not empty after applying fixers for ${stack.get(DataComponents.CUSTOM_DATA)?.copyTag()?.getString("id")}:
-            ${NbtUtils.prettyPrint(tag)}
+            ${prettyPrint(tag)}
             ${stack.toJson(ItemStack.CODEC)}
             """.trimIndent(),
             )
         }
 
         return stack
+    }
+
+    private fun prettyPrint(tag: Tag): String {
+        //? >= 26.1 {
+        return NbtUtils.prettyPrint(tag, true)
+        //? } else
+        // return NbtUtils.prettyPrint(tag)
     }
 }
