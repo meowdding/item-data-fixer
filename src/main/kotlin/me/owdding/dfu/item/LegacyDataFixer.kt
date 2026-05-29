@@ -75,7 +75,7 @@ object LegacyDataFixer {
         return stack
     }
 
-    private fun prettyPrint(tag: Tag): String {
+    internal fun prettyPrint(tag: Tag): String {
         //? >= 26.1 {
         return NbtUtils.prettyPrint(tag, true)
         //? } else

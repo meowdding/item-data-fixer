@@ -3,6 +3,7 @@
 package me.owdding.dfu.item.base
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import me.owdding.dfu.item.LegacyDataFixer
 import me.owdding.dfu.item.MeowddingItemDfu
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
@@ -912,7 +913,10 @@ object BaseItem {
         val meta = tag.getIntOr("Damage", 0)
         val count = tag.getIntOr("Count", 1)
 
-        val item = this.items[id][meta] ?: return null
+        val item = (this.items[id]?: run {
+            MeowddingItemDfu.warn("Unknown item id $id on item ${LegacyDataFixer.prettyPrint(tag)}.")
+            return null
+        })[meta] ?: return null
 
         tag.remove("id")
         tag.remove("Damage")
