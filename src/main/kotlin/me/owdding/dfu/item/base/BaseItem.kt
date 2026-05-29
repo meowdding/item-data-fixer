@@ -16,8 +16,11 @@ import kotlin.jvm.optionals.getOrNull
 object BaseItem {
 
     private val items = Int2ObjectOpenHashMap<Int2ObjectOpenHashMap<Item>>()
+    private val defaultItems = Int2ObjectOpenHashMap<Item>()
 
     init {
+        this.items.defaultReturnValue(defaultItems)
+
         registerComplex(1, 0, Items.STONE)
         registerComplex(1, 1, Items.GRANITE)
         registerComplex(1, 2, Items.POLISHED_GRANITE)
@@ -913,10 +916,7 @@ object BaseItem {
         val meta = tag.getIntOr("Damage", 0)
         val count = tag.getIntOr("Count", 1)
 
-        val item = (this.items[id]?: run {
-            MeowddingItemDfu.warn("Unknown item id $id on item ${LegacyDataFixer.prettyPrint(tag)}.")
-            return null
-        })[meta] ?: return null
+        val item = this.items[id][meta] ?: return null
 
         tag.remove("id")
         tag.remove("Damage")
