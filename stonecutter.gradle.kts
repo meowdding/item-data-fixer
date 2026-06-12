@@ -7,7 +7,7 @@ plugins {
     id("net.fabricmc.fabric-loom") version "1.14-SNAPSHOT" apply false
     `maven-publish`
 }
-stonecutter active "26.1"
+stonecutter active "26.2"
 
 stonecutter parameters {
     swaps["mod_version"] = "\"" + property("version") + "\";"
