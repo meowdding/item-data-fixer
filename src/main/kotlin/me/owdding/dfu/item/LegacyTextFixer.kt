@@ -11,10 +11,6 @@ object LegacyTextFixer {
 
     private const val CONTROL_CHAR = '§'
     val codeMap = buildMap<Char, Style.() -> Style> {
-        fun put(char: Char, init: Style.() -> Style) {
-            put(char.lowercaseChar(), init)
-        }
-
         // Color Codes
         put('0') { EMPTY.withColor(ChatFormatting.BLACK) }
         put('1') { EMPTY.withColor(ChatFormatting.DARK_BLUE) }
@@ -53,7 +49,7 @@ object LegacyTextFixer {
             append(this.readUntil(CONTROL_CHAR))
 
             while (this.canRead()) {
-                codeMap[this.read().lowercaseChar()]?.let { last = last.it() } ?: MeowddingItemDfu.warn("Unknown control character ${this.peek()} in text $text")
+                codeMap[this.read().lowercaseChar()]?.let { last = last.it() } ?: MeowddingItemDfu.warn("Unknown control character ${this.previous()} in text $text")
 
                 if (peek() == CONTROL_CHAR) {
                     skip()

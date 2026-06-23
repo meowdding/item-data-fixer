@@ -3,7 +3,6 @@
 package me.owdding.dfu.item.base
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
-import me.owdding.dfu.item.LegacyDataFixer
 import me.owdding.dfu.item.MeowddingItemDfu
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponents
@@ -102,7 +101,7 @@ object BaseItem {
         registerComplex(35, 13, Items.WOOL.green)
         registerComplex(35, 14, Items.WOOL.red)
         registerComplex(35, 15, Items.WOOL.black)
-        //? } else {
+        //?} else {
         /*registerComplex(35, 0, Items.WHITE_WOOL)
         registerComplex(35, 1, Items.ORANGE_WOOL)
         registerComplex(35, 2, Items.MAGENTA_WOOL)
@@ -119,7 +118,7 @@ object BaseItem {
         registerComplex(35, 13, Items.GREEN_WOOL)
         registerComplex(35, 14, Items.RED_WOOL)
         registerComplex(35, 15, Items.BLACK_WOOL)
-         *///? }
+         *///?}
         registerNormal(37, Items.DANDELION)
         registerComplex(38, 0, Items.POPPY)
         registerComplex(38, 1, Items.BLUE_ORCHID)
@@ -209,7 +208,7 @@ object BaseItem {
         registerComplex(35, 13, Items.STAINED_GLASS.green)
         registerComplex(35, 14, Items.STAINED_GLASS.red)
         registerComplex(35, 15, Items.STAINED_GLASS.black)
-        //? } else {
+        //?} else {
         /*registerComplex(95, 0, Items.WHITE_STAINED_GLASS)
         registerComplex(95, 1, Items.ORANGE_STAINED_GLASS)
         registerComplex(95, 2, Items.MAGENTA_STAINED_GLASS)
@@ -226,7 +225,7 @@ object BaseItem {
         registerComplex(95, 13, Items.GREEN_STAINED_GLASS)
         registerComplex(95, 14, Items.RED_STAINED_GLASS)
         registerComplex(95, 15, Items.BLACK_STAINED_GLASS)
-         *///? }
+         *///?}
         registerNormal(96, Items.OAK_TRAPDOOR)
         registerComplex(97, 0, Items.INFESTED_STONE)
         registerComplex(97, 1, Items.INFESTED_COBBLESTONE)
@@ -346,7 +345,7 @@ object BaseItem {
         registerComplex(35, 13, Items.STAINED_GLASS_PANE.green)
         registerComplex(35, 14, Items.STAINED_GLASS_PANE.red)
         registerComplex(35, 15, Items.STAINED_GLASS_PANE.black)
-        //? } else {
+        //?} else {
         /*registerComplex(159, 0, Items.WHITE_TERRACOTTA)
         registerComplex(159, 1, Items.ORANGE_TERRACOTTA)
         registerComplex(159, 2, Items.MAGENTA_TERRACOTTA)
@@ -379,7 +378,7 @@ object BaseItem {
         registerComplex(160, 13, Items.GREEN_STAINED_GLASS_PANE)
         registerComplex(160, 14, Items.RED_STAINED_GLASS_PANE)
         registerComplex(160, 15, Items.BLACK_STAINED_GLASS_PANE)
-         *///? }
+         *///?}
         registerComplex(161, 0, Items.ACACIA_LEAVES)
         registerComplex(161, 1, Items.DARK_OAK_LEAVES)
         registerComplex(162, 0, Items.ACACIA_LOG)
@@ -411,7 +410,7 @@ object BaseItem {
         registerComplex(35, 13, Items.CARPET.green)
         registerComplex(35, 14, Items.CARPET.red)
         registerComplex(35, 15, Items.CARPET.black)
-        //? } else {
+        //?} else {
         /*registerComplex(171, 0, Items.WHITE_CARPET)
         registerComplex(171, 1, Items.ORANGE_CARPET)
         registerComplex(171, 2, Items.MAGENTA_CARPET)
@@ -428,7 +427,7 @@ object BaseItem {
         registerComplex(171, 13, Items.GREEN_CARPET)
         registerComplex(171, 14, Items.RED_CARPET)
         registerComplex(171, 15, Items.BLACK_CARPET)
-         *///? }
+         *///?}
         registerNormal(172, Items.TERRACOTTA)
         registerNormal(173, Items.COAL_BLOCK)
         registerNormal(174, Items.PACKED_ICE)
@@ -441,10 +440,10 @@ object BaseItem {
         //? >= 26.2 {
         registerNormal(176, Items.BANNER.white) // standing banner
         registerNormal(177, Items.BANNER.white) // wall banner
-        //? } else {
+        //?} else {
         /*registerNormal(176, Items.WHITE_BANNER) // standing banner
         registerNormal(177, Items.WHITE_BANNER) // wall banner
-         *///? }
+         *///?}
         registerNormal(178, Items.DAYLIGHT_DETECTOR)
         registerComplex(179, 0, Items.RED_SANDSTONE)
         registerComplex(179, 1, Items.CHISELED_RED_SANDSTONE)
@@ -566,10 +565,10 @@ object BaseItem {
         //? >= 26.2 {
         registerComplex(351, 1, Items.DYE.red)
         registerComplex(351, 2, Items.DYE.green)
-        //? } else {
+        //?} else {
         /*registerComplex(351, 1, Items.RED_DYE)
         registerComplex(351, 2, Items.GREEN_DYE)
-         *///? }
+         *///?}
         registerComplex(351, 3, Items.COCOA_BEANS)
         registerComplex(351, 4, Items.LAPIS_LAZULI)
         //? >= 26.2 {
@@ -583,7 +582,7 @@ object BaseItem {
         registerComplex(351, 12, Items.DYE.lightBlue)
         registerComplex(351, 13, Items.DYE.magenta)
         registerComplex(351, 14, Items.DYE.orange)
-        //? } else {
+        //?} else {
         /*registerComplex(351, 5, Items.PURPLE_DYE)
         registerComplex(351, 6, Items.CYAN_DYE)
         registerComplex(351, 7, Items.LIGHT_GRAY_DYE)
@@ -594,7 +593,7 @@ object BaseItem {
         registerComplex(351, 12, Items.LIGHT_BLUE_DYE)
         registerComplex(351, 13, Items.MAGENTA_DYE)
         registerComplex(351, 14, Items.ORANGE_DYE)
-        *///? }
+        *///?}
         registerComplex(351, 15, Items.BONE_MEAL)
         registerNormal(352, Items.BONE)
         registerNormal(353, Items.SUGAR)
@@ -632,7 +631,7 @@ object BaseItem {
         registerComplex(26, 13, Items.BED.green)
         registerComplex(26, 14, Items.BED.red)
         registerComplex(26, 15, Items.BED.black)
-        //? } else {
+        //?} else {
         /*registerComplex(26, 0, Items.WHITE_BED)
         registerComplex(26, 1, Items.ORANGE_BED)
         registerComplex(26, 2, Items.MAGENTA_BED)
@@ -665,7 +664,7 @@ object BaseItem {
         registerComplex(355, 13, Items.GREEN_BED)
         registerComplex(355, 14, Items.RED_BED)
         registerComplex(355, 15, Items.BLACK_BED)
-         *///? }
+         *///?}
         registerNormal(356, Items.REPEATER)
         registerNormal(357, Items.COOKIE)
         registerNormal(358, Items.FILLED_MAP)
@@ -806,7 +805,7 @@ object BaseItem {
         registerComplex(425, 2, Items.BANNER.green)
         registerComplex(425, 1, Items.BANNER.red)
         registerComplex(425, 0, Items.BANNER.black)
-        //? } else {
+        //?} else {
         /*registerComplex(425, 15, Items.WHITE_BANNER)
         registerComplex(425, 14, Items.ORANGE_BANNER)
         registerComplex(425, 13, Items.MAGENTA_BANNER)
@@ -823,7 +822,7 @@ object BaseItem {
         registerComplex(425, 2, Items.GREEN_BANNER)
         registerComplex(425, 1, Items.RED_BANNER)
         registerComplex(425, 0, Items.BLACK_BANNER)
-         *///? }
+         *///?}
         registerNormal(427, Items.SPRUCE_DOOR)
         registerNormal(428, Items.BIRCH_DOOR)
         registerNormal(429, Items.JUNGLE_DOOR)
