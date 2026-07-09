@@ -8,10 +8,15 @@ import me.owdding.dfu.item.fixes.display.NameFixer
 import me.owdding.dfu.item.utils.getStringOrNull
 import me.owdding.dfu.item.utils.holder
 import me.owdding.dfu.item.utils.toJson
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.NbtUtils
 import net.minecraft.nbt.Tag
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
 
 object LegacyDataFixer {
@@ -60,12 +65,42 @@ object LegacyDataFixer {
             }
         }
 
+        val hasEncounteredError = mutableSetOf<Identifier>()
+
+        tag.getCompound("components").ifPresent { tag ->
+            tag.keySet().mapNotNull { Identifier.tryParse(it)?.let { id -> it to id } }.forEach { (key, identifier) ->
+                BuiltInRegistries.DATA_COMPONENT_TYPE.getOptional(identifier).ifPresent { componentType ->
+                    val value = tag.get(key) ?: return@ifPresent
+
+                    if (builder.set(componentType, value)) {
+                        tag.remove(key)
+                    } else {
+                        hasEncounteredError.add(identifier)
+                    }
+                }
+            }
+        }
+
         val stack = ItemStack(item.holder, count, builder.build())
 
-        if (MeowddingItemDfu.logErrors && !tag.isEmpty && !tag.getCompoundOrEmpty("tag").isEmpty) {
+        if (hasEncounteredError.isNotEmpty()) {
             MeowddingItemDfu.warn(
                 """
-            Item tag is not empty after applying fixers for ${stack.get(DataComponents.CUSTOM_DATA)?.copyTag()?.getString("id")}:
+            Failed to decode one or more components (${hasEncounteredError.joinToString(", ")}) in ${
+                    stack.get(DataComponents.CUSTOM_DATA)?.copyTag()?.getString("id")
+                }:
+            ${prettyPrint(tag)}
+            ${stack.toJson(ItemStack.CODEC)}
+            """.trimIndent(),
+            )
+        }
+
+        if (MeowddingItemDfu.logErrors && !tag.isEmpty && !tag.getCompoundOrEmpty("tag").isEmpty && hasEncounteredError.isEmpty()) {
+            MeowddingItemDfu.warn(
+                """
+            Item tag is not empty after applying fixers for ${
+                    stack.get(DataComponents.CUSTOM_DATA)?.copyTag()?.getString("id")
+                }:
             ${prettyPrint(tag)}
             ${stack.toJson(ItemStack.CODEC)}
             """.trimIndent(),
@@ -74,6 +109,11 @@ object LegacyDataFixer {
 
         return stack
     }
+
+    fun <Type : Any> DataComponentPatch.Builder.set(dataType: DataComponentType<Type>, tag: Tag): Boolean =
+        dataType.codec()?.parse(NbtOps.INSTANCE, tag)?.ifSuccess { type ->
+            set(dataType, type)
+        }?.isSuccess == true
 
     private fun prettyPrint(tag: Tag): String {
         //? >= 26.1 {
