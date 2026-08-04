@@ -15,7 +15,11 @@ internal fun CompoundTag.getStringOrNull(key: String): String? = this.getString(
 internal val Item.holder: Holder<Item> get() = this.builtInRegistryHolder()
 
 internal val ops: DynamicOps<JsonElement> get() {
-    return VanillaRegistries.createLookup().createSerializationContext(JsonOps.INSTANCE)
+    //? >= 26.3 {
+    //val lookup = VanillaRegistries.createWorldLookup()
+    //? } else
+    val lookup = VanillaRegistries.createLookup()
+    return lookup.createSerializationContext(JsonOps.INSTANCE)
 }
 
 internal fun <T : Any> T.toJson(codec: Codec<T>): JsonElement? {
