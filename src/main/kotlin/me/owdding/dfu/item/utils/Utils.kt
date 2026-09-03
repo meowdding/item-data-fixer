@@ -16,9 +16,9 @@ internal val Item.holder: Holder<Item> get() = this.builtInRegistryHolder()
 
 internal val ops: DynamicOps<JsonElement> get() {
     //? >= 26.3 {
-    //val lookup = VanillaRegistries.createWorldLookup()
-    //? } else
-    val lookup = VanillaRegistries.createLookup()
+    val lookup = VanillaRegistries.createWorldLookup()
+    //?} else
+    /*val lookup = VanillaRegistries.createLookup()*/
     return lookup.createSerializationContext(JsonOps.INSTANCE)
 }
 
