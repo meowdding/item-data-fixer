@@ -1,9 +1,0 @@
-[versions]
-
-minecraft = "1.21.11"
-parchment = "2025.10.12"
-
-[libraries]
-
-minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
-parchment = { module = "org.parchmentmc.data:parchment-1.21.10", version.ref = "parchment" } # TODO

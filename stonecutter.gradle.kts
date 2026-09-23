@@ -1,5 +1,5 @@
+import org.gradle.api.publish.internal.component.DefaultAdhocSoftwareComponent
 import org.gradle.kotlin.dsl.support.serviceOf
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
     id("dev.kikugie.stonecutter")
@@ -12,14 +12,9 @@ stonecutter active "26.3"
 stonecutter parameters {
     swaps["mod_version"] = "\"" + property("version") + "\";"
     swaps["minecraft"] = "\"" + node.metadata.version + "\";"
-    replacements.string("identifier") {
-        direction = eval(current.version, "<1.21.11")
-        replace(
-            "import net.minecraft.resources.Identifier",
-            "import net.minecraft.resources.ResourceLocation as Identifier"
-        )
-    }
 }
+
+evaluationDependsOnChildren()
 
 //<editor-fold desc="Publishing setup">
 val componentFactory = project.serviceOf<SoftwareComponentFactory>()
@@ -28,181 +23,26 @@ val minecraftVersionAttribute = Attribute.of("net.minecraft.version", String::cl
 val remappedAttribute = Attribute.of("net.fabricmc.remapped", String::class.java)
 
 stonecutter.versions.forEach { (project, version) ->
-    fun isObfuscated() = stonecutter.eval(version, "<=1.21.11")
-
-    fun runIfObfuscated(action: () -> Unit) {
-        if (isObfuscated()) action()
-    }
-
-
-    fun <T> selectIfObfuscated(obfuscated: T, unobfuscated: T) = if (isObfuscated()) obfuscated else unobfuscated
-
-
     val gradleFriendlyVersion = version.replace(".", "")
     val project = project(project)
 
-    runIfObfuscated {
-        val remappedApiElements = configurations.create(gradleFriendlyVersion + "remappedApiElements") {
+    val java = project.components.getByName<DefaultAdhocSoftwareComponent>("java")
+    java.usages.forEach { context ->
+        val config = configurations.create(gradleFriendlyVersion + "-" + context.name) {
             isCanBeResolved = false
             isCanBeConsumed = true
 
-            attributes {
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
-                attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-                attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-                attribute(
-                    TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-                    objects.named(TargetJvmEnvironment.STANDARD_JVM)
-                )
-                attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-                attribute(minecraftVersionAttribute, version)
-                attribute(remappedAttribute, "true")
-            }
+            attributes.addAllLater(context.attributes)
+            outgoing.artifacts.addAll(context.artifacts)
+            dependencies.addAll(context.dependencies)
+            dependencyConstraints.addAll(context.dependencyConstraints)
 
-            project.afterEvaluate {
-                this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
-                outgoing.artifact(tasks.named("remapJar"))
-            }
-
-            outgoing.capability("me.owdding:item-data-fixer-$version-remapped:${rootProject.version}")
+            outgoing.capability("me.owdding:item-data-fixer-$version:${rootProject.version}")
             outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
         }
-
-        val remappedRuntimeElements = configurations.create(gradleFriendlyVersion + "remappedRuntimeElements") {
-            isCanBeResolved = false
-            isCanBeConsumed = true
-
-            attributes {
-                attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-                attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-                attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 21)
-                attribute(
-                    TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-                    objects.named(TargetJvmEnvironment.STANDARD_JVM)
-                )
-                attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-                attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-                attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-                attribute(minecraftVersionAttribute, version)
-                attribute(remappedAttribute, "true")
-            }
-
-            project.afterEvaluate {
-                this@create.dependencies.addAll(configurations.named("runtimeOnly").get().dependencies)
-                this@create.dependencies.addAll(configurations.named("modRuntimeOnly").get().dependencies)
-                this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
-                outgoing.artifact(tasks.named("remapJar"))
-            }
-
-            outgoing.capability("me.owdding:item-data-fixer-$version-remapped:${rootProject.version}")
-            outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
-        }
-
-        dataFixerComponent.addVariantsFromConfiguration(remappedApiElements) {
+        dataFixerComponent.addVariantsFromConfiguration(config) {
             mapToOptional()
         }
-        dataFixerComponent.addVariantsFromConfiguration(remappedRuntimeElements) {
-            mapToOptional()
-        }
-    }
-
-    val apiElements = configurations.create(gradleFriendlyVersion + "apiElements") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_API))
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, selectIfObfuscated(21, 25))
-            attribute(
-                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-                objects.named(TargetJvmEnvironment.STANDARD_JVM)
-            )
-            attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-            attribute(minecraftVersionAttribute, version)
-            attribute(remappedAttribute, "false")
-        }
-
-        project.afterEvaluate {
-            this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-            runIfObfuscated {
-                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
-            }
-            outgoing.artifact(tasks.named("jar"))
-        }
-
-        outgoing.capability("me.owdding:item-data-fixer-$version:${rootProject.version}")
-        outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
-    }
-
-    val runtimeElements = configurations.create(gradleFriendlyVersion + "runtimeElements") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, selectIfObfuscated(21, 25))
-            attribute(
-                TargetJvmEnvironment.TARGET_JVM_ENVIRONMENT_ATTRIBUTE,
-                objects.named(TargetJvmEnvironment.STANDARD_JVM)
-            )
-            attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.LIBRARY))
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements.JAR))
-            attribute(minecraftVersionAttribute, version)
-            attribute(remappedAttribute, "false")
-        }
-
-        project.afterEvaluate {
-            this@create.dependencies.addAll(configurations.named("runtimeOnly").get().dependencies)
-            this@create.dependencies.addAll(configurations.named("api").get().dependencies)
-            runIfObfuscated {
-                this@create.dependencies.addAll(configurations.named("modRuntimeOnly").get().dependencies)
-                this@create.dependencies.addAll(configurations.named("modApi").get().dependencies)
-            }
-            outgoing.artifact(tasks.named("jar"))
-        }
-
-        outgoing.capability("me.owdding:item-data-fixer-$version:${rootProject.version}")
-        outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
-    }
-
-    val sourcesElements = configurations.create(gradleFriendlyVersion + "sources") {
-        isCanBeResolved = false
-        isCanBeConsumed = true
-
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage.JAVA_RUNTIME))
-            attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category.DOCUMENTATION))
-            attribute(Bundling.BUNDLING_ATTRIBUTE, objects.named(Bundling.EXTERNAL))
-            attribute(DocsType.DOCS_TYPE_ATTRIBUTE, objects.named(DocsType.SOURCES))
-            attribute(minecraftVersionAttribute, version)
-            attribute(remappedAttribute, "false")
-        }
-
-        project.afterEvaluate {
-            outgoing.artifact(tasks.named("sourcesJar"))
-        }
-
-        outgoing.capability("me.owdding:item-data-fixer-$version:${rootProject.version}")
-        outgoing.capability("me.owdding:item-data-fixer:${rootProject.version}")
-    }
-
-    dataFixerComponent.addVariantsFromConfiguration(apiElements) {
-        mapToOptional()
-    }
-    dataFixerComponent.addVariantsFromConfiguration(runtimeElements) {
-        mapToOptional()
-    }
-    dataFixerComponent.addVariantsFromConfiguration(sourcesElements) {
-        mapToOptional()
     }
 }
 
