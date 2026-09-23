@@ -12,7 +12,7 @@ plugins {
 
 rootProject.name = "item-data-fixer"
 
-val versions = listOf("26.1", "26.2", "26.3")
+val versions = listOf("26.1", "26.2", "26.3", "26.4")
 
 stonecutter {
     create(rootProject) {
